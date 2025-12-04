@@ -13,3 +13,6 @@ __pycache__/
 data/
 logs/
 output/
+
+# vscode
+.vscode/
