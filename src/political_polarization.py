@@ -58,7 +58,7 @@ SPECS: list[ScoreSpec] = [
         formula="mean([5-friend_comfort_out, 5-neigh_comfort_out, marriage_upset_out])",
         notes="Comfort items reversed so higher = more rejection; upset is already higher=more.",
     ),
-        ScoreSpec(
+    ScoreSpec(
         name="party_identity_strength",
         construct="Partisan identity strength",
         description="Mean of in-party identity importance, being in-party, in-party describes me, we-vs-they, and extremity strength.",
@@ -246,6 +246,7 @@ def _mean_row(values):
     values = [v for v in values if pd.notna(v)]
     return sum(values)/len(values) if values else pd.NA
 
+# TODO: refactor and do not define funtion inside function
 def compute_scores(df: pd.DataFrame, center_policy="lean") -> pd.DataFrame:
     out = df.copy()
 
@@ -352,6 +353,12 @@ def compute_scores(df: pd.DataFrame, center_policy="lean") -> pd.DataFrame:
     right_traits = _get_trait_block("right")
     left_traits  = _get_trait_block("left")
 
+    # Compute rating for each trait
+    for t in TRAITS:
+        out[f"trait_right_{t}"] = right_traits[t]
+        out[f"trait_left_{t}"]  = left_traits[t]
+
+    # Compute positive/negative means
     out["pos_right"] = right_traits[[t for t in TRAITS if t in POS_TRAITS]].mean(axis=1)
     out["neg_right"] = right_traits[[t for t in TRAITS if t in NEG_TRAITS]].mean(axis=1)
     out["pos_left"]  = left_traits[[t for t in TRAITS if t in POS_TRAITS]].mean(axis=1)
